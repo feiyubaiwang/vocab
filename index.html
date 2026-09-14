@@ -1860,7 +1860,7 @@
     currentIndex: 0,
     currentQuestion: null,
     correctCount: 0,
-    totalAttempted: 0,
+    answeredIds: new Set(),   // 已作答题目的 id，用于去重计数
     hasAnswered: false,
     selectedOption: null,
     clearedLevels: new Set(),
@@ -1891,10 +1891,18 @@
         if (typeof parsed.currentIndex === 'number' && parsed.currentIndex >= 0 && parsed.currentIndex < MOVIE_VOCAB_DB.length) {
           state.currentIndex = parsed.currentIndex;
         }
-        state.correctCount = parsed.correctCount || 0;
-        state.totalAttempted = parsed.totalAttempted || 0;
-        if (parsed.cleared) {
-          state.clearedLevels = new Set(parsed.cleared);
+        const loadedCleared = Array.isArray(parsed.cleared) ? new Set(parsed.cleared) : new Set();
+        state.clearedLevels = loadedCleared;
+
+        if (Array.isArray(parsed.answeredIds)) {
+          // 新版本：用持久化的答题 id 集合，结合 cleared 重建 correctCount
+          state.answeredIds = new Set(parsed.answeredIds);
+          state.correctCount = 0;
+          state.answeredIds.forEach(id => { if (loadedCleared.has(id)) state.correctCount++; });
+        } else {
+          // 旧版本迁移：没有去重集合时，只保留 clearedLevels，answeredIds 为空
+          // 旧 correctCount / totalAttempted 因累计不准被丢弃，让用户重新开始或逐题答完后计数自然恢复
+          state.correctCount = loadedCleared.size;
         }
       }
       const savedNotebook = localStorage.getItem(STORAGE_KEY_NOTEBOOK);
@@ -1913,7 +1921,7 @@
       const progressPayload = {
         currentIndex: state.currentIndex,
         correctCount: state.correctCount,
-        totalAttempted: state.totalAttempted,
+        answeredIds: Array.from(state.answeredIds),
         cleared: Array.from(state.clearedLevels)
       };
       localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progressPayload));
@@ -1981,9 +1989,10 @@
     const pct = ((index + 1) / MOVIE_VOCAB_DB.length) * 100;
     elProgressBar.style.width = `${pct}%`;
 
-    if (state.totalAttempted > 0) {
-      const acc = Math.round((state.correctCount / state.totalAttempted) * 100);
-      elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${state.totalAttempted})`;
+    const answeredN = state.answeredIds.size;
+    if (answeredN > 0) {
+      const acc = Math.round((state.correctCount / answeredN) * 100);
+      elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${answeredN})`;
     } else {
       elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">100%</span>`;
     }
@@ -2026,15 +2035,48 @@
       btn.addEventListener('click', () => handleSelectOption(opt, btn));
       elOptionsContainer.appendChild(btn);
     });
+
+    // 恢复已答题目状态（页面刷新/退出重进后）
+    if (state.answeredIds.has(q.id)) {
+      state.hasAnswered = true;
+      const wasCorrect = state.clearedLevels.has(q.id);
+
+      const blankSlot = document.getElementById('blankSlot');
+      if (blankSlot) {
+        blankSlot.textContent = `[ ${q.word} ]`;
+        blankSlot.style.borderColor = wasCorrect ? '#63A633' : '#A6263E';
+        blankSlot.style.color = wasCorrect ? '#63A633' : '#A6263E';
+      }
+
+      elOptionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.word === q.word) btn.classList.add('state-correct');
+      });
+
+      const actionBar = document.getElementById('answeredActionBar');
+      const statusText = document.getElementById('answeredStatusText');
+      const mainNextBtn = document.getElementById('mainNextBtn');
+      if (actionBar) actionBar.classList.remove('hidden');
+      if (statusText) {
+        statusText.innerHTML = wasCorrect
+          ? `[回答正确] 单词 <strong class="text-brand-accent">${q.word}</strong> 已掌握`
+          : `[回答错误] 正确答案为 <strong class="text-brand-accent">${q.word}</strong>`;
+      }
+      if (mainNextBtn) {
+        mainNextBtn.textContent = (state.currentIndex === MOVIE_VOCAB_DB.length - 1) ? '查看闯关总结果' : '下一个名场面';
+      }
+    }
   }
 
   function handleSelectOption(selectedWord, targetBtn) {
+    const q = state.currentQuestion;
+    // 防止同一题被重复计数（例如刷新页面后重新答已答过的题）
+    if (state.answeredIds.has(q.id)) return;
     if (state.hasAnswered) return;
+
     state.hasAnswered = true;
     state.selectedOption = selectedWord;
-    state.totalAttempted++;
-
-    const q = state.currentQuestion;
+    state.answeredIds.add(q.id);
     const isCorrect = (selectedWord.toLowerCase() === q.word.toLowerCase());
 
     const blankSlot = document.getElementById('blankSlot');
@@ -2064,8 +2106,9 @@
     savePersistedData();
 
     // 更新正确率指示
-    const acc = Math.round((state.correctCount / state.totalAttempted) * 100);
-    elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${state.totalAttempted})`;
+    const answeredN = state.answeredIds.size;
+    const acc = answeredN > 0 ? Math.round((state.correctCount / answeredN) * 100) : 100;
+    elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${answeredN})`;
 
     const actionBar = document.getElementById('answeredActionBar');
     const statusText = document.getElementById('answeredStatusText');
@@ -2175,7 +2218,7 @@
   }
 
   function openCompletionModal() {
-    const total = state.totalAttempted || MOVIE_VOCAB_DB.length;
+    const total = state.answeredIds.size || MOVIE_VOCAB_DB.length;
     const correct = state.correctCount;
     const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
 
@@ -2434,7 +2477,7 @@
       state.currentIndex = 0;
       state.clearedLevels.clear();
       state.correctCount = 0;
-      state.totalAttempted = 0;
+      state.answeredIds.clear();
       state.notebook.clear();
       savePersistedData();
       renderQuestion(0);
