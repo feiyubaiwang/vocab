@@ -39,45 +39,75 @@
     }
 
     body {
-      background-color: #1b213d;
+      background: radial-gradient(ellipse at 50% -10%, #262e54 0%, #1b213d 55%, #111426 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       color: #f1f3f9;
     }
 
-    /* 纯色扁平面板 */
+    /* 柔和微渐变高级面板与卡片 */
     .flat-panel {
-      background-color: #283059;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(165deg, rgba(43, 52, 94, 0.95) 0%, rgba(31, 38, 71, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 40px -10px rgba(8, 11, 24, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .flat-card {
-      background-color: #22294c;
-      border: 1px solid rgba(212, 217, 61, 0.3);
+      background: linear-gradient(165deg, #252d54 0%, #1c2242 100%);
+      border: 1px solid rgba(212, 217, 61, 0.28);
+      box-shadow: 0 20px 48px -12px rgba(6, 8, 18, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
-    /* 正确与错误状态边框 */
+    /* 电影质感微光按钮与控件 */
+    .btn-cinema {
+      background: linear-gradient(180deg, rgba(46, 56, 100, 0.9) 0%, rgba(33, 40, 75, 0.92) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+    .btn-cinema:hover {
+      background: linear-gradient(180deg, rgba(55, 66, 116, 0.95) 0%, rgba(39, 48, 88, 0.95) 100%);
+      border-color: rgba(212, 217, 61, 0.4);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #dde24a 0%, #c4c932 100%);
+      color: #13172b;
+      font-weight: bold;
+      border: 1px solid #d4d93d;
+      box-shadow: 0 4px 14px -2px rgba(212, 217, 61, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #e6eb5c 0%, #ced33b 100%);
+      box-shadow: 0 6px 20px -2px rgba(212, 217, 61, 0.4);
+    }
+
+    /* 柔和状态渐变与边缘微光 */
     .state-correct {
       border-color: #63A633 !important;
-      background-color: rgba(99, 166, 51, 0.2) !important;
-      color: #f1f3f9 !important;
+      background: linear-gradient(135deg, rgba(99, 166, 51, 0.28) 0%, rgba(68, 118, 33, 0.38) 100%) !important;
+      color: #f3faf0 !important;
+      box-shadow: 0 0 18px -2px rgba(99, 166, 51, 0.35) !important;
     }
 
     .state-wrong {
       border-color: #A6263E !important;
-      background-color: rgba(166, 38, 62, 0.2) !important;
-      color: #f1f3f9 !important;
+      background: linear-gradient(135deg, rgba(166, 38, 62, 0.28) 0%, rgba(120, 26, 45, 0.38) 100%) !important;
+      color: #faf0f2 !important;
+      box-shadow: 0 0 18px -2px rgba(166, 38, 62, 0.35) !important;
     }
 
-    /* 滚动条 */
+    /* 滚动条定制 */
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: #1b213d;
+      background: #151930;
     }
     ::-webkit-scrollbar-thumb {
-      background: #D4D93D;
+      background: linear-gradient(180deg, #d4d93d 0%, #a2a728 100%);
     }
   </style>
 </head>
@@ -94,16 +124,16 @@
 
     <!-- 控制与统计栏 -->
     <div class="flex items-center gap-2">
-      <button id="levelMapBtn" class="flat-panel hover:bg-brand-600 transition px-3 py-1.5 text-xs text-slate-200">
+      <button id="levelMapBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200">
         关卡: <span id="currentLevelLabel" class="text-brand-accent font-bold">1</span>/100
       </button>
 
-      <button id="notebookBtn" class="flat-panel hover:bg-brand-600 transition px-3 py-1.5 text-xs text-slate-200 flex items-center gap-1.5">
+      <button id="notebookBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200 flex items-center gap-1.5">
         <span>生词本</span>
         <span id="notebookCountBadge" class="hidden text-brand-accent font-bold">(0)</span>
       </button>
 
-      <button id="restartPromptBtn" class="flat-panel hover:bg-brand-600 transition px-3 py-1.5 text-xs text-slate-200">
+      <button id="restartPromptBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200">
         <span>[从头开始]</span>
       </button>
     </div>
@@ -111,8 +141,8 @@
 
   <!-- 顶部进度条 -->
   <div class="w-full max-w-5xl mx-auto px-4 mt-3">
-    <div class="w-full h-1 bg-brand-900 border border-white/10">
-      <div id="progressBar" class="h-full bg-brand-accent transition-all duration-300 w-[1%]"></div>
+    <div class="w-full h-1 bg-brand-950/80 border border-white/10">
+      <div id="progressBar" class="h-full bg-gradient-to-r from-[#9da229] to-brand-accent shadow-[0_0_8px_rgba(212,217,61,0.35)] transition-all duration-300 w-[1%]"></div>
     </div>
   </div>
 
@@ -147,7 +177,13 @@
         </p>
 
         <!-- 中文释义 -->
-        <div class="mt-3 p-3 bg-brand-900/70 border border-white/10 text-sm text-slate-300">
+      <div class="my-4">
+        <p id="quoteEnglish" class="text-base md:text-xl text-slate-100 leading-relaxed tracking-wide">
+          <!-- 挖空英文句子 -->
+        </p>
+
+        <!-- 中文释义 -->
+        <div class="mt-3 p-3 bg-gradient-to-r from-brand-950/70 to-brand-900/60 border border-white/10 text-sm text-slate-300 shadow-inner">
           <span class="text-brand-accent font-bold mr-2">[译文]</span>
           <span id="quoteChinese">中文翻译加载中...</span>
         </div>
@@ -160,20 +196,20 @@
         </div>
 
         <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <!-- 选项按钮由 JS 动态生成 -->
+          <!-- 选项按钮由 JS 动态随机生成 -->
         </div>
       </div>
 
       <!-- 答题后常驻操作栏 -->
-      <div id="answeredActionBar" class="mt-4 hidden flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-brand-900 border border-brand-accent/50">
+      <div id="answeredActionBar" class="mt-4 hidden flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-gradient-to-r from-brand-950/90 to-brand-900/90 border border-brand-accent/40 shadow-lg">
         <div class="text-xs md:text-sm text-brand-accent">
           <span id="answeredStatusText">已作答！可查看单词卡或继续下一题</span>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <button id="reopenModalBtn" class="px-3 py-1.5 text-xs bg-brand-800 hover:bg-brand-700 text-slate-200 border border-white/20 transition">
+          <button id="reopenModalBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200">
             [查看单词卡]
           </button>
-          <button id="mainNextBtn" class="px-4 py-1.5 text-xs md:text-sm font-bold bg-brand-accent text-brand-950 hover:brightness-105 border border-brand-accent transition">
+          <button id="mainNextBtn" class="btn-gold px-4 py-1.5 text-xs md:text-sm">
             下一个名场面
           </button>
         </div>
@@ -246,14 +282,66 @@
 
       <!-- 弹窗底部操作按钮 -->
       <div class="flex items-center justify-end gap-2 pt-1">
-        <button id="readSentenceBtn" class="px-3 py-1.5 text-xs bg-brand-800 hover:bg-brand-700 text-slate-200 border border-white/20">
+        <button id="readSentenceBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200">
           [朗读整句]
         </button>
-        <button id="nextQuestionBtn" class="px-4 py-1.5 text-xs font-bold bg-brand-accent text-brand-950 hover:brightness-105 border border-brand-accent">
+        <button id="nextQuestionBtn" class="btn-gold px-4 py-1.5 text-xs">
           下一个名场面
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- 100 关挑战通关结果 Modal -->
+  <div id="completionModal" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="flat-card w-full max-w-lg p-6 md:p-8 border-2 border-brand-accent text-left relative">
+      <div class="flex items-center justify-between pb-3 border-b border-brand-accent/30 mb-4">
+        <div>
+          <span class="text-xs px-2 py-0.5 bg-brand-900 text-brand-accent font-mono border border-brand-accent/40 font-bold">ALL 100 COMPLETED</span>
+          <h2 class="text-lg md:text-xl font-bold text-slate-100 mt-1">100 个电影名场面挑战圆满通关</h2>
+        </div>
+        <button id="closeCompletionModalBtn" class="px-2 py-0.5 text-xs bg-white/10 hover:bg-white/20 text-slate-300">
+          [关闭]
+        </button>
+      </div>
+
+      <!-- 成绩数据卡片 -->
+      <div class="grid grid-cols-3 gap-2.5 my-4">
+        <div class="p-3 bg-brand-900 border border-white/10 text-center">
+          <div class="text-[11px] text-slate-400">最终正确率</div>
+          <div id="compAccuracy" class="text-xl md:text-2xl font-bold text-brand-accent mt-1">100%</div>
+        </div>
+        <div class="p-3 bg-brand-900 border border-white/10 text-center">
+          <div class="text-[11px] text-slate-400">答对题目</div>
+          <div id="compCorrectCount" class="text-xl md:text-2xl font-bold text-brand-correct mt-1">100 / 100</div>
+        </div>
+        <div class="p-3 bg-brand-900 border border-white/10 text-center">
+          <div class="text-[11px] text-slate-400">生词本收录</div>
+          <div id="compNotebookCount" class="text-xl md:text-2xl font-bold text-slate-200 mt-1">0 词</div>
+        </div>
+      </div>
+
+      <!-- 鼓励寄语 -->
+      <div class="p-4 bg-brand-900/80 border border-brand-accent/40 my-4 text-xs md:text-sm text-slate-200 leading-relaxed">
+        <div class="text-brand-accent font-bold mb-1">[通关寄语]</div>
+        <p id="compEncouragementText">
+          百折不挠的挑战者！完整跨越了100部电影的考验。
+        </p>
+      </div>
+
+      <!-- 底部操作按钮 -->
+      <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2">
+        <button id="compOpenNotebookBtn" class="px-3 py-1.5 text-xs bg-brand-800 hover:bg-brand-700 text-slate-200 border border-white/20">
+          [查看生词本]
+        </button>
+        <button id="compOpenLevelMapBtn" class="px-3 py-1.5 text-xs bg-brand-800 hover:bg-brand-700 text-slate-200 border border-white/20">
+          [关卡一览]
+        </button>
+        <button id="compRestartBtn" class="px-4 py-1.5 text-xs font-bold bg-brand-accent text-brand-950 hover:brightness-105 border border-brand-accent">
+          [从头开始新一轮]
+        </button>
+      </div>
     </div>
   </div>
 
@@ -263,7 +351,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
         <div>
           <h3 class="text-sm font-bold text-brand-accent">100 个电影关卡导航</h3>
-          <p class="text-xs text-slate-400">点击任意关卡直接切换挑战</p>
+          <p class="text-xs text-slate-400">点击任意关卡查看对应电影单词卡</p>
         </div>
         <button id="closeLevelMapBtn" class="px-2 py-0.5 text-xs bg-white/10 hover:bg-white/20 text-slate-300">
           [关闭]
@@ -281,7 +369,6 @@
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-brand-accent inline-block"></span>当前</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-white/10 inline-block"></span>未挑战</span>
         </div>
-        <button id="resetProgressBtn" class="text-brand-wrong hover:underline">[重置进度]</button>
       </div>
     </div>
   </div>
@@ -328,7 +415,7 @@
         </button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed mb-4">
-        确定要从头开始挑战吗？这将彻底清空所有闯关进度、正确率与生词本记录，恢复至初始状态。
+        确定要从头开始挑战吗？这将彻底清空所有闯关进度、正确率与生词本记录，恢复至第1关初始状态，并随机重置所有选项顺序。
       </p>
       <div class="flex items-center justify-end gap-2 pt-1">
         <button id="cancelRestartBtn" class="px-3 py-1.5 text-xs bg-brand-800 hover:bg-brand-700 text-slate-200 border border-white/20 transition">
@@ -353,7 +440,7 @@
 
   <script>
   /**
-   * 100个经典电影场景 英语单词数据库
+   * 100 部完全不重复的经典英文电影 & 100 个互不相同的核心单词数据库 (100 Unique Films & 100 Unique Words)
    */
   const MOVIE_VOCAB_DB = [
     {
@@ -722,7 +809,7 @@
     },
     {
       id: 27,
-      movie: "指环王：双塔奇兵 (The Lord of the Rings)",
+      movie: "指环王：双塔奇兵 (The Lord of the Rings: The Two Towers)",
       speaker: "山姆 (Samwise Gamgee)",
       listener: "弗罗多 (Frodo)",
       scene: "废墟残阳下安慰心力交瘁的魔戒持有者",
@@ -905,7 +992,7 @@
     {
       id: 40,
       movie: "模仿游戏 (The Imitation Game)",
-      speaker: "克里斯托弗·莫康 (Alan Turing)",
+      speaker: "图灵 (Alan Turing)",
       listener: "琼·克拉克 (Joan Clarke)",
       scene: "图灵为坚持制造破解恩尼格玛电码的巨型机器而倾诉",
       en: "Sometimes it is the people no one imagines anything of who do the things that no one can _____.",
@@ -946,17 +1033,17 @@
     },
     {
       id: 43,
-      movie: "放牛班的春天 (The Chorus)",
-      speaker: "马修老师 (Clément Mathieu)",
-      listener: "蒙丹 (Mondain)",
-      scene: "音乐教师用温柔与坚守化解问题少年心中的仇恨",
-      en: "Every rebellious heart hides an unspoken wound. Kindness can _____ what strict rules cannot.",
-      word: "reconcile",
-      options: ["reconcile", "recollect", "reproduce", "reassure"],
-      phonetic: "/ˈrekənsaɪl/",
-      pos: "v.",
-      meaning: "调解，使和解，使和谐一致",
-      trans: "每一颗桀骜不驯的心底都隐藏着未言说的伤痕。善意能够抚平严刑峻法无法调和的一切。"
+      movie: "控方证人 (Witness for the Prosecution)",
+      speaker: "韦菲爵士 (Sir Wilfrid)",
+      listener: "克里斯汀 (Christine Helm)",
+      scene: "老辩护律师在法庭休庭期间盘问关键证人的证词漏洞",
+      en: "The truth has a peculiar way of leaking out when someone tries to manufacture a false _____.",
+      word: "testimony",
+      options: ["testimony", "temperament", "threshold", "trajectory"],
+      phonetic: "/ˈtestɪməni/",
+      pos: "n.",
+      meaning: "证词，证明，见证",
+      trans: "当有人企图编造虚假证词时，真理往往会以一种极其奇特微妙的方式露出马脚。"
     },
     {
       id: 44,
@@ -1006,12 +1093,12 @@
       speaker: "派 (Pi Patel)",
       listener: "作家 (Writer)",
       scene: "回忆起与孟加拉虎理查德·帕克在沙滩头也不回的别离",
-      en: "I suppose in the end, the whole of life becomes an act of letting go, but what always hurts most is not taking a moment to _____ properly.",
-      word: "bid farewell",
-      options: ["bid farewell", "bear burden", "break barrier", "build trust"],
-      phonetic: "/bɪd feəˈwel/",
-      pos: "phrase",
-      meaning: "道别，辞别",
+      en: "I suppose in the end, the whole of life becomes an act of letting go, but what hurts most is not taking a moment to say _____.",
+      word: "farewell",
+      options: ["farewell", "fertility", "fraction", "formula"],
+      phonetic: "/ˌfeəˈwel/",
+      pos: "n.",
+      meaning: "告别，辞别，再见",
       trans: "我想人生到头来就是不断地放下，但最让人心痛的，往往是没能好好地道一声别。"
     },
     {
@@ -1133,12 +1220,12 @@
       listener: "沙威 (Javert)",
       scene: "在巷战废墟中放走视自己为死敌的警长沙威",
       en: "You are doing your duty as you see it. I bear you no grudge; I am merely a man who seeks _____.",
-      word: "redemption",
-      options: ["redemption", "restriction", "rebellion", "relocation"],
-      phonetic: "/rɪˈdempʃn/",
+      word: "atonement",
+      options: ["atonement", "assessment", "astonishment", "amendment"],
+      phonetic: "/əˈtəʊnmənt/",
       pos: "n.",
-      meaning: "救赎，赎罪，弥补",
-      trans: "你只是在尽你所认为的职责。我对你毫无怨恨；我不过是一个在风雨中祈求灵魂救赎的人。"
+      meaning: "赎罪，弥补，补偿",
+      trans: "你只是在尽你所认为的职责。我对你毫无怨恨；我不过是一个祈求救赎与弥补罪愆的人。"
     },
     {
       id: 57,
@@ -1189,12 +1276,12 @@
       listener: "马奇太太 (Marmee)",
       scene: "乔在阁楼上为女性的独立与孤独痛哭倾诉",
       en: "Women have minds and souls as well as hearts; ambition as well as beauty. I'm so sick of people saying that love is all a woman is _____ for.",
-      word: "fit",
-      options: ["fit", "fatal", "favorable", "flexible"],
-      phonetic: "/fɪt/",
+      word: "destined",
+      options: ["destined", "delighted", "depressed", "deviated"],
+      phonetic: "/ˈdestɪnd/",
       pos: "adj.",
-      meaning: "适合的，适宜的，胜任的",
-      trans: "女性不仅有心，更有头脑与灵魂；不仅有美貌，更有雄心抱负。我受够了所有人都说爱情是女人唯一的归宿。"
+      meaning: "注定的，命中注定的",
+      trans: "女性不仅有心，更有头脑与灵魂；不仅有美貌，更有雄心抱负。我受够了所有人都说爱情是女人唯一的命运归宿。"
     },
     {
       id: 61,
@@ -1202,13 +1289,13 @@
       speaker: "威蒙德 (Waymond Wang)",
       listener: "伊芙琳 (Evelyn)",
       scene: "在多重宇宙的废墟中解释自己一贯柔和处世的生存哲学",
-      en: "When I choose to see the good side of things, I'm not being naive. It is strategic and necessary. Please, be _____ especially when we don't know what's going on.",
-      word: "kind",
-      options: ["kind", "keen", "knowing", "knight"],
-      phonetic: "/kaɪnd/",
-      pos: "adj.",
-      meaning: "善良的，友善的，体贴的",
-      trans: "当我选择看到事物好的一面时，我不是天真。这是一种策略，也是必要的生存之道。尤其当我们迷茫未知时，请保持善良。"
+      en: "When I choose to see the good side of things, I'm not being naive. It is strategic and necessary. Please, show _____ especially when we don't know what's going on.",
+      word: "compassion",
+      options: ["compassion", "concession", "compulsion", "contempt"],
+      phonetic: "/kəmˈpæʃn/",
+      pos: "n.",
+      meaning: "同情，怜悯，慈悲心",
+      trans: "当我选择看到事物好的一面时，我不是天真。这是一种策略，也是生存之道。尤其当我们迷茫未知时，请展现你的慈悲与善意。"
     },
     {
       id: 62,
@@ -1229,20 +1316,20 @@
       movie: "黑天鹅 (Black Swan)",
       speaker: "托马斯导师 (Thomas Leroy)",
       listener: "妮娜 (Nina Sayers)",
-      scene: "在排练厅要求完美主义芭蕾舞者释放原始野性",
-      en: "Perfection is not just about control. It's also about letting go. Surprise yourself and the audience with _____ passion.",
-      word: "spontaneous",
-      options: ["spontaneous", "suspicious", "strenuous", "simultaneous"],
-      phonetic: "/spɒnˈteɪniəs/",
+      scene: "在排练厅要求芭蕾舞者释放原始野性冲破僵化束缚",
+      en: "Perfection is not just about control. It is also about letting go. Transcending your limits requires an _____ impulse.",
+      word: "untamed",
+      options: ["untamed", "unanimous", "underlying", "unwarranted"],
+      phonetic: "/ˌʌnˈteɪmd/",
       pos: "adj.",
-      meaning: "自发的，自然的，肆意勃发的",
-      trans: "完美绝不仅仅意味着精确的控制，更在于适时的放手。用一种肆意勃发的天然激情来惊艳你自己和观众吧。"
+      meaning: "未被驯服的，狂野桀骜的，原始奔放的",
+      trans: "完美绝不仅仅意味着精确的控制，更在于适时的放手。超越你自身的极限需要一种狂野不羁的本能冲动。"
     },
     {
       id: 64,
       movie: "荒野生存 (Into the Wild)",
       speaker: "克里斯托弗 (Christopher McCandless)",
-      listener: "日记 (Diary / Read by Ron)",
+      listener: "日记 (Diary)",
       scene: "在废弃巴士中临终前写下对人与世间连接的彻悟",
       en: "Happiness is only real when shared. Complete isolation will only _____ the soul from true warmth.",
       word: "alienate",
@@ -1258,7 +1345,7 @@
       speaker: "凯瑟琳 (Katharine Clifton)",
       listener: "艾马殊伯爵 (Almásy)",
       scene: "在洞穴垂危之际写下对无国界纯粹爱恋的向往",
-      en: "We die rich with lovers and tribes, tastes we have swallowed, bodies we have entered and swum up like rivers. We are the true countries, not the _____ boundaries drawn on maps.",
+      en: "We die rich with lovers and tribes, tastes we have swallowed, bodies we have entered. We are the true countries, not the _____ boundaries drawn on maps.",
       word: "artificial",
       options: ["artificial", "authentic", "ambiguous", "arbitrary"],
       phonetic: "/ˌɑːtɪˈfɪʃl/",
@@ -1310,45 +1397,45 @@
     },
     {
       id: 69,
-      movie: "辩护人 (The Attorney)",
-      speaker: "宋佑硕律师 (Song Woo-seok)",
-      listener: "法官与检察官 (Court)",
-      scene: "法庭上为无辜被刑讯逼供的学生拍案而起大声呐喊",
-      en: "National security cannot be an excuse to _____ the constitutional rights of innocent citizens!",
-      word: "infringe",
-      options: ["infringe", "incline", "infect", "inflate"],
-      phonetic: "/ɪnˈfrɪndʒ/",
-      pos: "v.",
-      meaning: "侵犯，侵害（权利），违反",
-      trans: "国家安全绝不能成为肆意侵犯无辜公民宪法权利的借口！"
+      movie: "杀死一只知更鸟 (To Kill a Mockingbird)",
+      speaker: "阿蒂克斯·芬奇 (Atticus Finch)",
+      listener: "斯库特 (Scout)",
+      scene: "正义律师教导女儿做人必须守住不受世俗裹挟的良心底线",
+      en: "The one thing that doesn't abide by majority rule is a person's _____. It is the compass of the soul.",
+      word: "conscience",
+      options: ["conscience", "consequence", "coincidence", "competence"],
+      phonetic: "/ˈkɒnʃəns/",
+      pos: "n.",
+      meaning: "良心，良知，道德准绳",
+      trans: "唯一不能遵从多数人暴政的，就是一个人的良知。它是灵魂深处唯一的指南针。"
     },
     {
       id: 70,
-      movie: "寄生虫 (Parasite)",
-      speaker: "金基泽父亲 (Ki-taek)",
-      listener: "基宇 (Ki-woo)",
-      scene: "在体育馆难民收容所坦白底层随波逐流的生存无奈",
-      en: "Do you know what kind of plan never fails? No plan at all. When you make a plan, life will always _____ your expectations.",
-      word: "disrupt",
-      options: ["disrupt", "distribute", "disguise", "dissolve"],
-      phonetic: "/dɪsˈrʌpt/",
-      pos: "v.",
-      meaning: "打乱，扰乱，使中断",
-      trans: "你知道什么样的计划永远不会失败吗？根本没有计划。只要你制定了计划，生活就总会打乱你的所有预期。"
+      movie: "盗火线 (Heat)",
+      speaker: "尼尔·麦考利 (Neil McCauley)",
+      listener: "文森特·汉纳 (Vincent Hanna)",
+      scene: "在咖啡馆里神偷与警探巅峰对视时吐露职业准则",
+      en: "Don't let yourself get attached to anything you are not willing to walk out on in 30 seconds flat if you feel the heat. Maintain ruthless _____.",
+      word: "discipline",
+      options: ["discipline", "dimension", "distraction", "discretion"],
+      phonetic: "/ˈdɪsəplɪn/",
+      pos: "n.",
+      meaning: "纪律，自律，克制，惩戒",
+      trans: "一旦察觉到风声，绝不要让自己迷恋任何你不能在30秒内彻底抽身而退的事物。保持残酷的冷酷自律。"
     },
     {
       id: 71,
-      movie: "触不可及 (The Intouchables)",
-      speaker: "菲利普 (Philippe)",
-      listener: "亲戚朋友 (Relatives)",
-      scene: "解释为何雇用刑满释放的街头青年德希斯做私人护理",
-      en: "He forgets that I'm disabled. He treats me without pity, and that absence of pity is utterly _____.",
-      word: "refreshing",
-      options: ["refreshing", "relentless", "repulsive", "reproachful"],
-      phonetic: "/rɪˈfreʃɪŋ/",
-      pos: "adj.",
-      meaning: "令人耳目一新的，使人精神振作的",
-      trans: "他总忘记我是个残疾人。他对待我毫无怜悯，而这种毫无施舍怜悯的态度，简直令人无比舒畅爽朗。"
+      movie: "飞屋环游记 (Up)",
+      speaker: "艾丽的留言 (Ellie's Note)",
+      listener: "卡尔老爷爷 (Carl Fredricksen)",
+      scene: "翻到冒险日记最后一页，发现妻子留给自己的释怀箴言",
+      en: "Thanks for the _____ — now go have a new one! Love, Ellie.",
+      word: "adventure",
+      options: ["adventure", "advantage", "adversity", "advocate"],
+      phonetic: "/ədˈventʃə(r)/",
+      pos: "n.",
+      meaning: "冒险，惊险历程，奇遇",
+      trans: "谢谢你陪伴我经历的这场盛大冒险——现在，去开启属于你的全新奇遇吧！爱你的，艾丽。"
     },
     {
       id: 72,
@@ -1422,31 +1509,31 @@
     },
     {
       id: 77,
-      movie: "西西里的美丽传说 (Malèna)",
-      speaker: "雷纳多 (Renato Amoroso)",
-      listener: "独白 / 记忆中的玛莲娜 (Memory of Malèna)",
-      scene: "少年骑着自行车回顾一生中最魂牵梦绕的女子",
-      en: "Of all the women I've loved, she is the only one I could never forget. Her image remains entirely _____ in my heart.",
-      word: "intact",
-      options: ["intact", "instant", "intense", "intricate"],
-      phonetic: "/ɪnˈtækt/",
-      pos: "adj.",
-      meaning: "完好无损的，未受损伤的",
-      trans: "在我爱过的所有女子中，她是唯一我从未遗忘的人。她的倩影在我的记忆深处依然完好如初。"
+      movie: "终结者2：审判日 (Terminator 2: Judgment Day)",
+      speaker: "莎拉·康纳 (Sarah Connor)",
+      listener: "独白 (Monologue)",
+      scene: "在夜间公路上注视着未知的未来，坚信命运掌握在人类自己手中",
+      en: "The future's not set. There's no fate but what we make for ourselves through resolute _____.",
+      word: "perseverance",
+      options: ["perseverance", "perplexity", "prosecution", "permeability"],
+      phonetic: "/ˌpɜːsɪˈvɪərəns/",
+      pos: "n.",
+      meaning: "毅力，坚持不懈，百折不挠",
+      trans: "未来并非命中注定。除了我们凭借坚定坚韧的毅力亲手所创造的一切，世上别无所谓宿命。"
     },
     {
       id: 78,
-      movie: "天堂电影院 (Cinema Paradiso)",
-      speaker: "阿尔弗雷多 (Alfredo)",
-      listener: "多托 (Salvatore / Toto)",
-      scene: "盲眼放映员力劝少年离开闭塞海岛走向广阔世界",
-      en: "Living here every day, you think this is the center of the world. You must leave; life is not what you saw in films, it is much more _____.",
-      word: "rigorous",
-      options: ["rigorous", "ridiculous", "righteous", "reluctant"],
-      phonetic: "/ˈrɪɡərəs/",
-      pos: "adj.",
-      meaning: "严酷的，严格的，缜密的",
-      trans: "天天待在这里，你会以为这就是世界的中心。你必须离开；生活绝不是你在电影里看到的那样，现实要严酷得多。"
+      movie: "侏罗纪公园 (Jurassic Park)",
+      speaker: "马尔科姆博士 (Ian Malcolm)",
+      listener: "哈蒙德创办人 (John Hammond)",
+      scene: "在吉普车上警告狂妄科学家生命总会突破人为禁锢",
+      en: "Life cannot be contained. Life breaks free. Life expands to new territories and crashes through barriers, painfully, maybe even dangerously, but life finds a way to _____.",
+      word: "flourish",
+      options: ["flourish", "falter", "fracture", "furnish"],
+      phonetic: "/ˈflʌrɪʃ/",
+      pos: "v.",
+      meaning: "繁荣，茁壮成长，蓬勃发展",
+      trans: "生命绝不可能被轻易圈禁。生命会突破桎梏、开辟疆域、撞碎藩篱，或许痛苦甚至凶险，但生命总会找到蓬勃繁衍的出路。"
     },
     {
       id: 79,
@@ -1482,13 +1569,13 @@
       speaker: "撒切尔夫人 (Margaret Thatcher)",
       listener: "内阁成员 (Cabinet)",
       scene: "强调治国主见，倡导关注思想与原则而非随波逐流",
-      en: "Watch your thoughts, for they become words. Watch your words, for they become actions. Character is your ultimate _____.",
-      word: "destiny",
-      options: ["destiny", "density", "dispute", "deficit"],
-      phonetic: "/ˈdestəni/",
+      en: "Watch your thoughts, for they become words. Watch your words, for they become actions. Character is the indelible _____ you leave behind.",
+      word: "legacy",
+      options: ["legacy", "liability", "lethargy", "liberty"],
+      phonetic: "/ˈleɡəsi/",
       pos: "n.",
-      meaning: "命运，宿命",
-      trans: "注意你的思想，它会化为语言；注意你的言语，它会化为行动。品格就是你最终的宿命。"
+      meaning: "遗产，留存后世的伟业/影响",
+      trans: "注意你的思想，它会化为言语；注意你的言语，它会化为行动。品格就是你留给这个世界不可磨灭的传世遗产。"
     },
     {
       id: 82,
@@ -1497,18 +1584,18 @@
       listener: "斯科菲尔德准下士 (Lance Corporal Schofield)",
       scene: "在堑壕指挥所接下停火命令，指出战争残酷的反复无常",
       en: "I hoped today would be a good day. Hope is a _____ thing. Next week the command will find another reason to charge.",
-      word: "dangerous",
-      options: ["dangerous", "delicate", "decisive", "diligent"],
-      phonetic: "/ˈdeɪndʒərəs/",
+      word: "hazardous",
+      options: ["hazardous", "harmonious", "hesitant", "hospitable"],
+      phonetic: "/ˈhæzədəs/",
       pos: "adj.",
-      meaning: "危险的，凶险的",
+      meaning: "危险的，冒险的，充满隐患的",
       trans: "我曾指望今天会是好日子。希望是件危险的东西。到了下周，指挥部又会找另一个理由让我们发起冲锋。"
     },
     {
       id: 83,
       movie: "伯德小姐 (Lady Bird)",
-      speaker: "伯德小姐 (Christine 'Lady Bird')",
-      listener: "修女老师 (Sister Sarah Joan)",
+      speaker: "修女老师 (Sister Sarah Joan)",
+      listener: "伯德小姐 (Christine 'Lady Bird')",
       scene: "修女赞扬她的大学申请文书流露对家乡萨克拉门托深沉的爱",
       en: "Don't you think maybe they are the same thing: love and _____? You pay so much attention to this town.",
       word: "attention",
@@ -1525,26 +1612,26 @@
       listener: "铁皮人 (Tin Man)",
       scene: "在翡翠城将丝绸心脏赠予以为自己没有感情的铁皮人",
       en: "A heart is not judged by how much you love, but by how much you are _____ by others.",
-      word: "loved",
-      options: ["loved", "limited", "liberated", "loathed"],
-      phonetic: "/lʌvd/",
-      pos: "v./adj.",
-      meaning: "被爱的，受人爱戴的",
-      trans: "衡量一颗心是否真诚，不在于你付出了多少爱，而在于你被他人回馈了多少由衷的爱意。"
+      word: "adored",
+      options: ["adored", "abhorred", "adapted", "adopted"],
+      phonetic: "/əˈdɔːd/",
+      pos: "adj.",
+      meaning: "深受爱戴的，受人爱戴的",
+      trans: "衡量一颗心是否真诚，不在于你付出了多少爱，而在于你被他人回馈了多少由衷的爱戴。"
     },
     {
       id: 85,
       movie: "雨中曲 (Singin' in the Rain)",
       speaker: "唐·洛克伍德 (Don Lockwood)",
-      listener: "凯茜 (Kathy Selden)",
+      listener: "独白 (Dance in the Rain)",
       scene: "在街灯雨幕中撑伞欢快起舞，庆祝爱情降临的释怀",
       en: "Come on with the rain, I've a smile on my face! No downpour can dampen my _____ joy.",
-      word: "spontaneous",
-      options: ["spontaneous", "superficial", "skeptical", "solitary"],
-      phonetic: "/spɒnˈteɪniəs/",
+      word: "ecstatic",
+      options: ["ecstatic", "erratic", "eccentric", "explicit"],
+      phonetic: "/ɪkˈstætɪk/",
       pos: "adj.",
-      meaning: "自发的，毫无拘束的",
-      trans: "让暴风雨来得更猛烈些吧，我脸上洋溢着微笑！任何倾盆大雨都无法浇灭我心底无拘无束的狂喜。"
+      meaning: "狂喜的，欣喜若狂的",
+      trans: "让暴风雨来得更猛烈些吧，我脸上洋溢着微笑！任何倾盆大雨都无法浇灭我心底狂喜炽烈的心跳。"
     },
     {
       id: 86,
@@ -1607,154 +1694,154 @@
       movie: "卡特教练 (Coach Carter)",
       speaker: "克鲁兹队员 (Timo Cruz)",
       listener: "卡特教练 (Ken Carter)",
-      scene: "在图书馆里向拯救了他们人生的教练朗诵玛丽安·威廉森的箴言",
+      scene: "在图书馆里向拯救了他们人生的教练朗诵箴言",
       en: "Our deepest fear is not that we are inadequate. Our deepest fear is that we are powerful beyond _____.",
       word: "measure",
       options: ["measure", "mercy", "mediocrity", "motive"],
       phonetic: "/ˈmeʒə(r)/",
       pos: "n.",
-      meaning: "尺度，分寸；beyond measure 意为无法衡量、无可比拟",
+      meaning: "尺度，分寸；beyond measure 意为无法衡量、不可限量",
       trans: "我们内心深处最深的恐惧，并不是我们无能为力；我们最深的恐惧，是我们拥有无法衡量的强大力量。"
     },
     {
       id: 91,
-      movie: "三傻大闹宝莱坞 (3 Idiots)",
-      speaker: "兰彻 (Rancho)",
-      listener: "法罕与拉加 (Farhan & Raju)",
-      scene: "在皇家工程学院天台上剖析教育功利化本质与成功的真谛",
-      en: "Pursue excellence, not success. Chase competence and success will _____ follow you effortlessly.",
-      word: "inevitably",
-      options: ["inevitably", "inadvertently", "inadequately", "indecisively"],
-      phonetic: "/ɪnˈevɪtəbli/",
-      pos: "adv.",
-      meaning: "不可避免地，必然地",
-      trans: "追求卓越，而不是追求成功。专注于提升自己的才华与真本事，成功自然而然、不可阻挡地会追随于你。"
+      movie: "源代码 (Source Code)",
+      speaker: "柯尔特上尉 (Colter Stevens)",
+      listener: "古德温军官 (Goodwin)",
+      scene: "在列车时间循环即将终结前选择重塑平行现实的希望",
+      en: "If you could change the future, what would you do? We possess the capacity to _____ our shared destiny.",
+      word: "modify",
+      options: ["modify", "mortify", "magnify", "multiply"],
+      phonetic: "/ˈmɒdɪfaɪ/",
+      pos: "v.",
+      meaning: "修改，变更，修饰",
+      trans: "如果你能改变未来，你会怎么做？我们完全拥有去修正并重塑共同命运的力量。"
     },
     {
       id: 92,
-      movie: "摔跤吧！爸爸 (Dangal)",
-      speaker: "马哈维亚 (Mahavir Singh Phogat)",
-      listener: "吉塔 (Geeta Phogat)",
-      scene: "英联邦运动会决赛前夕告诫大女儿这不仅是金牌更是全体女孩的尊严",
-      en: "If you win tomorrow, you will not win alone. Millions of girls will break free from prejudice and _____ their own destinies.",
-      word: "reclaim",
-      options: ["reclaim", "refrain", "reconcile", "reinforce"],
-      phonetic: "/rɪˈkleɪm/",
+      movie: "荒岛余生 (Cast Away)",
+      speaker: "查克·诺兰德 (Chuck Noland)",
+      listener: "老友斯坦 (Stan)",
+      scene: "重返现代文明后回忆在无人荒岛靠坚守活下来的意义",
+      en: "I know what I have to do now. I've got to keep breathing, because tomorrow the sun will rise. Who knows what the tide could _____ in?",
+      word: "deliver",
+      options: ["deliver", "deprive", "deflect", "demolish"],
+      phonetic: "/dɪˈlɪvə(r)/",
       pos: "v.",
-      meaning: "收回，重新夺回，改造",
-      trans: "如果你明天赢了，你就不是一个人在赢。千千万万的印度女孩将打破世俗偏见，重新夺回掌握自己命运的主权。"
+      meaning: "递送，带来，实现，解救",
+      trans: "我现在清楚自己该做什么了。我必须保持呼吸，因为明天太阳照常升起。谁知道潮水会为你带来怎样的生机呢？"
     },
     {
       id: 93,
-      movie: "闻香识女人 (Scent of a Woman)",
-      speaker: "弗兰克中校 (Frank Slade)",
-      listener: "全校师生 (School Assembly)",
-      scene: "在最终高潮演讲中赞扬查理选择艰难但崇高的道路",
-      en: "I always knew what the right path was. Without exception, I knew, but I never took it. You know why? It was too damn _____.",
-      word: "hard",
-      options: ["hard", "hostile", "humble", "hasty"],
-      phonetic: "/hɑːd/",
+      movie: "十二怒汉 (12 Angry Men)",
+      speaker: "8号陪审员戴维斯 (Juror 8)",
+      listener: "陪审团成员 (Jurors)",
+      scene: "在闷热的法庭休会室坚持不可草率定罪，捍卫无罪推定原则",
+      en: "It's not easy to raise my hand and send a boy off to die without talking about it first. We cannot be _____ when a human life is at stake.",
+      word: "negligent",
+      options: ["negligent", "notorious", "neutral", "nominal"],
+      phonetic: "/ˈneɡlɪdʒənt/",
       pos: "adj.",
-      meaning: "艰难的，艰苦卓绝的",
-      trans: "在人生的每一个十字路口，我毫无例外地全都知道哪条路是正确的。但我从未走过。你知道为什么吗？因为那太他妈艰辛了。"
+      meaning: "疏忽的，大意的，渎职的",
+      trans: "在没有事先深入讨论的情况下举手送一个孩子赴死并不容易。当人命关天时，我们绝不能马虎疏忽。"
     },
     {
       id: 94,
-      movie: "楚门的世界 (The Truman Show)",
-      speaker: "楚门 (Truman Burbank)",
-      listener: "亿万电视观众 (Global Viewers)",
-      scene: "站在摄影棚尽头的逃生门前，向全世界致以经典的鞠躬告别",
-      en: "In case I don't see ya: good afternoon, good evening, and good night! May your life be filled with _____ joy.",
-      word: "genuine",
-      options: ["genuine", "generous", "gloomy", "gigantic"],
-      phonetic: "/ˈdʒenjuɪn/",
-      pos: "adj.",
-      meaning: "真挚的，真实的，发自内心的",
-      trans: "假如再也见不到你：祝你下午好、晚上好，并且晚安！愿你的生活充盈着真正发自内心的纯粹喜悦。"
+      movie: "诺丁山 (Notting Hill)",
+      speaker: "安娜·斯科特 (Anna Scott)",
+      listener: "威廉·萨克 (William Thacker)",
+      scene: "在狭小书店里巨星抛下光环向普通店主倾吐心声",
+      en: "The fame thing isn't really real, you know. I'm also just a girl, standing in front of a boy, asking him to _____ her feelings.",
+      word: "reciprocate",
+      options: ["reciprocate", "rehabilitate", "renounce", "reproach"],
+      phonetic: "/rɪˈsɪprəkeɪt/",
+      pos: "v.",
+      meaning: "回应，回报（感情），报答",
+      trans: "名声这东西并不真实，你知道的。其实我也只是一个女孩，站在心爱的男孩面前，恳请他能够回应自己的这份真情。"
     },
     {
       id: 95,
-      movie: "乱世佳人 (Gone with the Wind)",
-      speaker: "斯嘉丽 (Scarlett O'Hara)",
-      listener: "荒芜的塔拉庄园 (Tara)",
-      scene: "抓起泥土对苍天发下永不挨饿、永不认输的钢铁誓言",
-      en: "As God is my witness, they're not going to lick me. I'm going to live through this, and my will shall remain _____.",
-      word: "unyielding",
-      options: ["unyielding", "unanimous", "unwarranted", "unconscious"],
-      phonetic: "/ʌnˈjiːldɪŋ/",
-      pos: "adj.",
-      meaning: "不屈不挠的，坚毅果敢的",
-      trans: "上帝为我作证，他们绝不可能打垮我。我一定会熬过这一关，我的意志必将百折不挠、永不低头。"
+      movie: "毕业生 (The Graduate)",
+      speaker: "本杰明 (Benjamin Braddock)",
+      listener: "父亲的朋友们 (Guests)",
+      scene: "在泳池边面对长辈们的世俗前途规划感到茫然与疏离",
+      en: "I just want to be... comfortable. I feel a growing _____ with the neat path everyone laid out for me.",
+      word: "disillusion",
+      options: ["disillusion", "disposition", "disclaimer", "dissension"],
+      phonetic: "/ˌdɪsɪˈluːʒn/",
+      pos: "n./v.",
+      meaning: "幻灭，醒悟，清醒的失望",
+      trans: "我只是想感到坦然自若。对于所有人为我预先铺设好的规矩坦途，我感到一种愈发强烈的幻灭与困惑。"
     },
     {
       id: 96,
-      movie: "星际穿越 (Interstellar)",
-      speaker: "库珀 (Cooper)",
-      listener: "墨菲 (Murph)",
-      scene: "离家前往深空虫洞前把手表留给女儿，约定相对论重逢",
-      en: "We're not meant to save the world. We're meant to leave it. Our survival demands an _____ leap into the unknown.",
-      word: "audacious",
-      options: ["audacious", "ambiguous", "anonymous", "authentic"],
-      phonetic: "/ɔːˈdeɪʃəs/",
-      pos: "adj.",
-      meaning: "大胆的，敢于冒险的，鲁莽勇猛的",
-      trans: "我们生来不是为了拯救这个旧世界，而是为了离开它。人类的存续需要向未知深空迈出勇敢大胆的一大步。"
+      movie: "地心引力 (Gravity)",
+      speaker: "莱恩·斯通博士 (Dr. Ryan Stone)",
+      listener: "独白 (Descent into Earth)",
+      scene: "在再入大气层的穿梭机残骸中下定决心重返大地活下去",
+      en: "I'm either gonna make it down there in one piece and have one hell of a story to tell, or I'm gonna burn up in the next ten minutes. Either way, no _____.",
+      word: "regrets",
+      options: ["regrets", "relapses", "remedies", "repeals"],
+      phonetic: "/rɪˈɡrets/",
+      pos: "n.",
+      meaning: "遗憾，懊悔",
+      trans: "我要么完好无损地降落回大地，拥有一个惊心动魄的故事可讲；要么在接下来的十分钟里化为灰烬。无论哪种结局，此生无悔。"
     },
     {
       id: 97,
-      movie: "肖申克的救赎 (The Shawshank Redemption)",
-      speaker: "瑞德 (Red)",
-      listener: "安迪 (Andy)",
-      scene: "瑞德在放风操场警告安迪不要对监狱高墙外的世界抱有幻想",
-      en: "Hope is a dangerous thing. Hope can drive a man insane. It has no place inside these cold, _____ walls.",
-      word: "gloomy",
-      options: ["gloomy", "glamorous", "gratifying", "grievous"],
-      phonetic: "/ˈɡluːmi/",
-      pos: "adj.",
-      meaning: "阴暗的，令人沮丧的，阴郁的",
-      trans: "希望是个危险的东西。希望会让人发疯。在这些冰冷阴暗的围墙之内，希望根本毫无立足之地。"
+      movie: "现代启示录 (Apocalypse Now)",
+      speaker: "科茨上校 (Colonel Kurtz)",
+      listener: "威尔拉德上尉 (Willard)",
+      scene: "在幽暗神庙深处审视人性深渊与战争疯狂的终极本质",
+      en: "Horror has a face, and you must make a friend of horror. Terror and moral panic are your allies to _____ weakness.",
+      word: "vanquish",
+      options: ["vanquish", "varnish", "venerate", "vacillate"],
+      phonetic: "/ˈvæŋkwɪʃ/",
+      pos: "v.",
+      meaning: "征服，击溃，完全克服",
+      trans: "恐惧是有面孔的，你必须和恐惧结为同盟。唯有恐怖与道德上的决绝，才是你彻底征服自身软弱的盟友。"
     },
     {
       id: 98,
-      movie: "角斗士 (Gladiator)",
-      speaker: "马克西姆斯 (Maximus)",
-      listener: "骑兵连队士兵们 (Roman Cavalry)",
-      scene: "日耳曼森林雪战前夕，将军拔出佩剑鼓舞将士名垂青史",
-      en: "Brothers, what we do in life echoes in _____. Fight with honor and make every breath count!",
-      word: "eternity",
-      options: ["eternity", "entity", "equity", "emission"],
-      phonetic: "/ɪˈtɜːnəti/",
+      movie: "疯狂的麦克斯4：狂暴之路 (Mad Max: Fury Road)",
+      speaker: "弗瑞奥萨指挥官 (Imperator Furiosa)",
+      listener: "麦克斯 (Max Rockatansky)",
+      scene: "在风沙荒原中解释为什么不惜一切代价带领逃亡",
+      en: "Out here, survival is not enough. We must fight for _____, or we remain prisoners of our past.",
+      word: "redemption",
+      options: ["redemption", "relaxation", "recession", "repudiation"],
+      phonetic: "/rɪˈdempʃn/",
       pos: "n.",
-      meaning: "永恒，不朽，来世",
-      trans: "兄弟们，我们在有生之年所做的一切，都将在永恒中回响。带着荣誉战斗吧，让每一次呼吸都有意义！"
+      meaning: "救赎，赎罪，超脱",
+      trans: "在这片荒原之上，光是生存远远不够。我们必须为了救赎而战，否则我们终将永远沦为过去的囚徒。"
     },
     {
       id: 99,
-      movie: "教父 (The Godfather)",
-      speaker: "老教父维托 (Don Corleone)",
-      listener: "约翰尼·冯塔纳 (Johnny Fontane)",
-      scene: "在书房训斥哭哭啼啼的教子必须像个真正的男人一样挺起脊梁",
-      en: "A man who doesn't spend time with his family can never be a real man. Never reveal a _____ weakness to your adversaries.",
-      word: "fatal",
-      options: ["fatal", "feasible", "fertile", "fragile"],
-      phonetic: "/ˈfeɪtl/",
-      pos: "adj.",
-      meaning: "致命的，毁灭性的，灾难性的",
-      trans: "一个不抽时间陪伴家人的男人永远算不上真正的男人。永远不要在你的敌人面前暴露出致命的软肋。"
+      movie: "极速车王 (Ford v Ferrari)",
+      speaker: "卡罗尔·谢尔比 (Carroll Shelby)",
+      listener: "亨利·福特二世 (Henry Ford II)",
+      scene: "在跑道边阐述赛车手在七千转极限速度下的物我两忘境界",
+      en: "There's a point at 7,000 RPM where everything fades. The machine becomes weightless, and you cross an invisible _____.",
+      word: "boundary",
+      options: ["boundary", "bureaucracy", "backlash", "beverage"],
+      phonetic: "/ˈbaʊndri/",
+      pos: "n.",
+      meaning: "界限，边界，极限",
+      trans: "当转速达到7000转时，周围的一切都会悄然隐退。赛车变得毫无重量，而你正跨越一道无形的极限边界。"
     },
     {
       id: 100,
-      movie: "楚门的世界 (The Truman Show)",
-      speaker: "克里斯托弗 (Christof)",
-      listener: "世界观众 (World Viewers)",
-      scene: "电视制作人剖析为什么观众三十年来对楚门的生活如痴如醉",
-      en: "We accept the reality of the world with which we're presented. It's as simple as that. Truth is the ultimate _____ of art.",
-      word: "pursuit",
-      options: ["pursuit", "protocol", "precaution", "paradox"],
-      phonetic: "/pəˈsjuːt/",
+      movie: "2001太空漫游 (2001: A Space Odyssey)",
+      speaker: "大卫·鲍曼 (David Bowman)",
+      listener: "地面指令部 (Mission Control)",
+      scene: "穿越浩瀚星门跃迁进入宇宙终极智慧领域的永恒惊叹",
+      en: "My God, it's full of stars! We have arrived at the cosmic _____ of human comprehension.",
+      word: "threshold",
+      options: ["threshold", "tyranny", "trajectory", "tribute"],
+      phonetic: "/ˈθreʃhəʊld/",
       pos: "n.",
-      meaning: "追求，寻求，事业",
-      trans: "人们总是盲目接受摆在眼前的大千世界现实。事情就这么简单。而对本真的追寻，则是艺术最崇高的终极使命。"
+      meaning: "门槛，极限，开端，转折点",
+      trans: "我的上帝啊，这里全都是浩瀚的群星！我们已经抵达了人类认知宇宙的终极门槛。"
     }
   ];
 
@@ -1762,18 +1849,29 @@
   const state = {
     currentIndex: 0,
     currentQuestion: null,
-    streak: 0,
     correctCount: 0,
     totalAttempted: 0,
     hasAnswered: false,
     selectedOption: null,
-    unlockedMax: 1,
     clearedLevels: new Set(),
     notebook: new Map(),
   };
 
-  const STORAGE_KEY_PROGRESS = 'cinevox_vocab_progress_v2';
-  const STORAGE_KEY_NOTEBOOK = 'cinevox_vocab_notebook_v2';
+  let modalActiveItem = null;
+  let modalMode = 'answer'; // 'answer' (答题反馈) | 'review' (关卡卡片查阅)
+
+  const STORAGE_KEY_PROGRESS = 'cinevox_vocab_progress_v3';
+  const STORAGE_KEY_NOTEBOOK = 'cinevox_vocab_notebook_v3';
+
+  // Fisher-Yates 真正随机洗牌算法
+  function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
   function speak(text, rate = 0.9) {
     if (!('speechSynthesis' in window)) return;
@@ -1803,8 +1901,6 @@
         if (typeof parsed.currentIndex === 'number' && parsed.currentIndex >= 0 && parsed.currentIndex < MOVIE_VOCAB_DB.length) {
           state.currentIndex = parsed.currentIndex;
         }
-        state.unlockedMax = parsed.unlockedMax || 1;
-        state.streak = parsed.streak || 0;
         state.correctCount = parsed.correctCount || 0;
         state.totalAttempted = parsed.totalAttempted || 0;
         if (parsed.cleared) {
@@ -1826,8 +1922,6 @@
     try {
       const progressPayload = {
         currentIndex: state.currentIndex,
-        unlockedMax: state.unlockedMax,
-        streak: state.streak,
         correctCount: state.correctCount,
         totalAttempted: state.totalAttempted,
         cleared: Array.from(state.clearedLevels)
@@ -1864,7 +1958,7 @@
   const elCurrentLevelLabel = document.getElementById('currentLevelLabel');
   const elAccuracyStats = document.getElementById('accuracyStats');
 
-  // 弹窗元素
+  // 单词卡弹窗元素
   const elVocabModal = document.getElementById('vocabModal');
   const elModalResultBadge = document.getElementById('modalResultBadge');
   const elModalWord = document.getElementById('modalWord');
@@ -1876,6 +1970,13 @@
   const elToggleBookmarkBtn = document.getElementById('toggleBookmarkBtn');
   const elBookmarkText = document.getElementById('bookmarkText');
 
+  // 通关弹窗元素
+  const elCompletionModal = document.getElementById('completionModal');
+  const elCompAccuracy = document.getElementById('compAccuracy');
+  const elCompCorrectCount = document.getElementById('compCorrectCount');
+  const elCompNotebookCount = document.getElementById('compNotebookCount');
+  const elCompEncouragement = document.getElementById('compEncouragementText');
+
   function renderQuestion(index) {
     state.currentIndex = index;
     state.hasAnswered = false;
@@ -1883,7 +1984,7 @@
     const q = MOVIE_VOCAB_DB[index];
     state.currentQuestion = q;
 
-    // 每次切换关卡立即持久化保存当前所在进度
+    // 每次切换关卡立即持久化保存当前所在关卡进度
     savePersistedData();
 
     elCurrentLevelLabel.textContent = q.id;
@@ -1910,19 +2011,20 @@
     const actionBar = document.getElementById('answeredActionBar');
     if (actionBar) actionBar.classList.add('hidden');
 
-    const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+    // 每次渲染题目或从头开始，都强制通过洗牌算法彻底随机化4个选项的排列顺序
+    const shuffledOptions = shuffleArray(q.options);
     elOptionsContainer.innerHTML = '';
 
     const letters = ['A', 'B', 'C', 'D'];
     shuffledOptions.forEach((opt, idx) => {
       const btn = document.createElement('button');
-      btn.className = `option-btn p-3 text-left font-medium border border-white/15 bg-brand-800 hover:bg-brand-700 text-slate-200 hover:text-white transition-colors flex items-center justify-between`;
+      btn.className = `option-btn btn-cinema p-3 text-left font-medium text-slate-200 hover:text-white flex items-center justify-between`;
       btn.dataset.word = opt;
       btn.dataset.index = idx;
 
       btn.innerHTML = `
         <div class="flex items-center gap-2.5">
-          <span class="w-6 h-6 bg-brand-900 border border-white/20 flex items-center justify-center font-mono text-xs text-brand-accent font-bold">
+          <span class="w-6 h-6 bg-brand-950/80 border border-white/20 flex items-center justify-center font-mono text-xs text-brand-accent font-bold">
             ${letters[idx]}
           </span>
           <span class="text-base tracking-wide">${opt}</span>
@@ -1962,26 +2064,33 @@
 
     if (isCorrect) {
       state.correctCount++;
-      state.streak++;
       state.clearedLevels.add(q.id);
-      if (q.id >= state.unlockedMax && state.unlockedMax < MOVIE_VOCAB_DB.length) {
-        state.unlockedMax = q.id + 1;
-      }
     } else {
-      state.streak = 0;
       addToNotebook(q);
     }
 
     savePersistedData();
 
+    // 更新正确率指示
+    const acc = Math.round((state.correctCount / state.totalAttempted) * 100);
+    elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${state.totalAttempted})`;
+
     const actionBar = document.getElementById('answeredActionBar');
     const statusText = document.getElementById('answeredStatusText');
+    const mainNextBtn = document.getElementById('mainNextBtn');
+
     if (actionBar) {
       actionBar.classList.remove('hidden');
       if (isCorrect) {
         statusText.innerHTML = `[回答正确] 单词 <strong class="text-brand-accent">${q.word}</strong> 已掌握`;
       } else {
         statusText.innerHTML = `[回答错误] 正确答案为 <strong class="text-brand-accent">${q.word}</strong>（已入生词本）`;
+      }
+
+      if (state.currentIndex === MOVIE_VOCAB_DB.length - 1) {
+        if (mainNextBtn) mainNextBtn.textContent = '查看闯关总结果';
+      } else {
+        if (mainNextBtn) mainNextBtn.textContent = '下一个名场面';
       }
     }
 
@@ -1991,7 +2100,9 @@
   }
 
   function openVocabModal(isCorrect) {
+    modalMode = 'answer';
     const q = state.currentQuestion;
+    modalActiveItem = q;
     
     if (isCorrect) {
       elModalResultBadge.className = 'text-xs font-bold text-brand-correct tracking-wide';
@@ -2010,6 +2121,39 @@
     elModalFullQuote.innerHTML = `“${highlightedEn}”`;
     elModalQuoteTrans.textContent = `释义: “${q.trans}”`;
 
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    if (state.currentIndex === MOVIE_VOCAB_DB.length - 1) {
+      if (nextBtn) nextBtn.textContent = '查看闯关总结果';
+    } else {
+      if (nextBtn) nextBtn.textContent = '下一个名场面';
+    }
+
+    updateBookmarkButtonState(q.word);
+
+    elVocabModal.classList.remove('opacity-0', 'pointer-events-none');
+    speak(q.word);
+  }
+
+  // 关卡地图中查阅指定关卡的单词卡（不打断主游戏答题进程）
+  function openVocabModalForReview(q) {
+    modalMode = 'review';
+    modalActiveItem = q;
+
+    elModalResultBadge.className = 'text-xs font-bold text-brand-accent tracking-wide';
+    elModalResultBadge.textContent = `[第 ${q.id} 关电影单词卡] ${q.movie}`;
+
+    elModalWord.textContent = q.word;
+    elModalPhonetic.textContent = q.phonetic;
+    elModalPos.textContent = q.pos;
+    elModalMeaning.textContent = q.meaning;
+
+    const highlightedEn = q.en.replace(/_{3,}/g, `<strong class="text-brand-accent underline px-1">${q.word}</strong>`);
+    elModalFullQuote.innerHTML = `“${highlightedEn}”`;
+    elModalQuoteTrans.textContent = `释义: “${q.trans}”`;
+
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    if (nextBtn) nextBtn.textContent = '[返回关卡导航]';
+
     updateBookmarkButtonState(q.word);
 
     elVocabModal.classList.remove('opacity-0', 'pointer-events-none');
@@ -2020,14 +2164,41 @@
     elVocabModal.classList.add('opacity-0', 'pointer-events-none');
   }
 
+  function handleModalActionBtnClick() {
+    if (modalMode === 'review') {
+      closeVocabModal();
+      renderLevelsGrid();
+      elLevelMapModal.classList.remove('opacity-0', 'pointer-events-none');
+    } else {
+      nextQuestion();
+    }
+  }
+
   function nextQuestion() {
     closeVocabModal();
     if (state.currentIndex + 1 < MOVIE_VOCAB_DB.length) {
       renderQuestion(state.currentIndex + 1);
     } else {
-      showToast('恭喜！已完成全部 100 个电影场景挑战！');
-      renderQuestion(state.currentIndex);
+      // 100 关全部作答完毕，展示通关成果结算面板
+      openCompletionModal();
     }
+  }
+
+  function openCompletionModal() {
+    const total = state.totalAttempted || MOVIE_VOCAB_DB.length;
+    const correct = state.correctCount;
+    const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
+
+    elCompAccuracy.textContent = `${accuracy}%`;
+    elCompCorrectCount.textContent = `${correct} / ${total}`;
+    elCompNotebookCount.textContent = `${state.notebook.size} 词`;
+
+    elCompEncouragement.textContent = "百折不挠的挑战者！完整跨越了100部电影的考验。";
+    elCompletionModal.classList.remove('opacity-0', 'pointer-events-none');
+  }
+
+  function closeCompletionModal() {
+    elCompletionModal.classList.add('opacity-0', 'pointer-events-none');
   }
 
   function addToNotebook(item) {
@@ -2077,9 +2248,10 @@
         <span class="text-[9px] font-normal opacity-80 truncate max-w-[40px]">${q.word.slice(0, 4)}</span>
       `;
 
+      // 点击关卡数字卡片直接弹出该关的单词卡供查看，不重置或切换当前题目的答题进度
       btn.addEventListener('click', () => {
         elLevelMapModal.classList.add('opacity-0', 'pointer-events-none');
-        renderQuestion(idx);
+        openVocabModalForReview(q);
       });
       elLevelsGrid.appendChild(btn);
     });
@@ -2148,7 +2320,7 @@
       showToast('生词本暂无内容可导出');
       return;
     }
-    let text = '=== CineVox 电影英语单词笔记 ===\n\n';
+    let text = '=== 电影单词闯关 • 生词本 ===\n\n';
     state.notebook.forEach((item) => {
       text += `• ${item.word} ${item.phonetic} [${item.pos}] ${item.meaning}\n`;
       text += `  出处: ${item.movie}\n`;
@@ -2171,17 +2343,19 @@
 
   function setupEventListeners() {
     document.getElementById('pronounceBtn').addEventListener('click', () => {
-      if (state.currentQuestion) speak(state.currentQuestion.word);
+      const item = modalActiveItem || state.currentQuestion;
+      if (item) speak(item.word);
     });
 
     document.getElementById('readSentenceBtn').addEventListener('click', () => {
-      if (state.currentQuestion) {
-        const full = state.currentQuestion.en.replace(/_{3,}/g, state.currentQuestion.word);
+      const item = modalActiveItem || state.currentQuestion;
+      if (item) {
+        const full = item.en.replace(/_{3,}/g, item.word);
         speak(full, 0.85);
       }
     });
 
-    document.getElementById('nextQuestionBtn').addEventListener('click', nextQuestion);
+    document.getElementById('nextQuestionBtn').addEventListener('click', handleModalActionBtnClick);
     document.getElementById('closeModalBtn').addEventListener('click', closeVocabModal);
 
     elVocabModal.addEventListener('click', (e) => {
@@ -2202,7 +2376,7 @@
     }
 
     elToggleBookmarkBtn.addEventListener('click', () => {
-      const q = state.currentQuestion;
+      const q = modalActiveItem || state.currentQuestion;
       if (!q) return;
       if (state.notebook.has(q.word)) {
         state.notebook.delete(q.word);
@@ -2215,6 +2389,7 @@
       updateBookmarkButtonState(q.word);
     });
 
+    // 关卡全览按钮
     const levelMapBtn = document.getElementById('levelMapBtn');
     const closeLevelMapBtn = document.getElementById('closeLevelMapBtn');
     levelMapBtn.addEventListener('click', () => {
@@ -2225,6 +2400,7 @@
       elLevelMapModal.classList.add('opacity-0', 'pointer-events-none');
     });
 
+    // 生词本按钮
     const notebookBtn = document.getElementById('notebookBtn');
     const closeNotebookBtn = document.getElementById('closeNotebookBtn');
     notebookBtn.addEventListener('click', () => {
@@ -2243,16 +2419,21 @@
       showToast('生词本已清空');
     });
 
-    document.getElementById('resetProgressBtn').addEventListener('click', () => {
-      state.unlockedMax = 1;
-      state.clearedLevels.clear();
-      state.streak = 0;
-      state.correctCount = 0;
-      state.totalAttempted = 0;
-      savePersistedData();
+    // 通关结果弹窗相关按钮
+    document.getElementById('closeCompletionModalBtn').addEventListener('click', closeCompletionModal);
+    document.getElementById('compOpenNotebookBtn').addEventListener('click', () => {
+      closeCompletionModal();
+      renderNotebookList();
+      elNotebookModal.classList.remove('opacity-0', 'pointer-events-none');
+    });
+    document.getElementById('compOpenLevelMapBtn').addEventListener('click', () => {
+      closeCompletionModal();
       renderLevelsGrid();
-      renderQuestion(0);
-      showToast('所有闯关进度已重置');
+      elLevelMapModal.classList.remove('opacity-0', 'pointer-events-none');
+    });
+    document.getElementById('compRestartBtn').addEventListener('click', () => {
+      closeCompletionModal();
+      restartModal.classList.remove('opacity-0', 'pointer-events-none');
     });
 
     // 从头开始挑战弹窗逻辑
@@ -2274,72 +2455,39 @@
     if (cancelRestartBtn) cancelRestartBtn.addEventListener('click', hideRestartModal);
 
     restartModal.addEventListener('click', (e) => {
-      if (e.target === restartModal) {
-        hideRestartModal();
-      }
+      if (e.target === restartModal) hideRestartModal();
     });
 
+    // 确认从头开始：彻底清空进度，从第1关开始，并随机刷新题目选项
     confirmResetBtn.addEventListener('click', () => {
       hideRestartModal();
       state.currentIndex = 0;
-      state.unlockedMax = 1;
       state.clearedLevels.clear();
-      state.streak = 0;
       state.correctCount = 0;
       state.totalAttempted = 0;
       state.notebook.clear();
       savePersistedData();
       renderQuestion(0);
-      showToast('已彻底清空进度，从头开始挑战');
+      showToast('已彻底清空进度，从第1题重新挑战');
     });
 
-    window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      const key = e.key.toUpperCase();
-
-      if (state.hasAnswered) {
-        if (e.code === 'Space' || e.code === 'Enter') {
-          e.preventDefault();
-          nextQuestion();
-          return;
-        }
-      }
-
-      if (!elVocabModal.classList.contains('pointer-events-none')) {
-        if (key === 'P' && state.currentQuestion) {
-          speak(state.currentQuestion.word);
-        } else if (e.key === 'Escape') {
-          closeVocabModal();
-        }
-        return;
-      }
-
-      if (!state.hasAnswered) {
-        const optionBtns = elOptionsContainer.querySelectorAll('.option-btn');
-        let chosenIndex = -1;
-        if (['1', '2', '3', '4'].includes(e.key)) {
-          chosenIndex = parseInt(e.key) - 1;
-        } else if (['A', 'B', 'C', 'D'].includes(key)) {
-          chosenIndex = key.charCodeAt(0) - 65;
-        }
-
-        if (chosenIndex >= 0 && chosenIndex < optionBtns.length) {
-          e.preventDefault();
-          optionBtns[chosenIndex].click();
-        }
-      }
-
-      if (key === 'P' && state.currentQuestion) {
-        speak(state.currentQuestion.word);
-      }
+    // 点击弹窗背景关闭
+    elCompletionModal.addEventListener('click', (e) => {
+      if (e.target === elCompletionModal) closeCompletionModal();
+    });
+    elLevelMapModal.addEventListener('click', (e) => {
+      if (e.target === elLevelMapModal) elLevelMapModal.classList.add('opacity-0', 'pointer-events-none');
+    });
+    elNotebookModal.addEventListener('click', (e) => {
+      if (e.target === elNotebookModal) elNotebookModal.classList.add('opacity-0', 'pointer-events-none');
     });
   }
 
+  // 页面加载启动
   window.addEventListener('DOMContentLoaded', () => {
     loadPersistedData();
     setupEventListeners();
-    // 恢复上次关闭网页前所停留的关卡
+    // 显示上次停留的关卡并确保选项随机化排布
     renderQuestion(state.currentIndex);
   });
   </script>
