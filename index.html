@@ -257,7 +257,7 @@
         </button>
       </div>
 
-      <!-- 单词、音标与朗读/收藏按钮（移动端两按钮同行等高对齐） -->
+      <!-- 单词、音标与生词本按钮 -->
       <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 pb-3 mb-3 border-b border-white/10">
         <div class="min-w-0">
           <h2 id="modalWord" class="text-2xl md:text-3xl font-bold tracking-wide text-brand-accent break-all">
@@ -269,14 +269,9 @@
           </div>
         </div>
 
-        <div class="flex items-stretch gap-2 shrink-0">
-          <button id="pronounceBtn" class="btn-cinema whitespace-nowrap flex items-center justify-center px-3 py-2 text-xs text-brand-accent">
-            [朗读单词]
-          </button>
-          <button id="toggleBookmarkBtn" class="btn-cinema whitespace-nowrap flex items-center justify-center px-3 py-2 text-xs text-slate-200">
-            <span id="bookmarkText">[加入生词本]</span>
-          </button>
-        </div>
+        <button id="toggleBookmarkBtn" class="btn-cinema whitespace-nowrap shrink-0 flex items-center justify-center px-3 py-2 text-xs text-slate-200">
+          <span id="bookmarkText">[加入生词本]</span>
+        </button>
       </div>
 
       <!-- 中文释义 -->
@@ -300,9 +295,6 @@
 
       <!-- 弹窗底部操作按钮 -->
       <div class="flex items-center justify-end gap-2 pt-1">
-        <button id="readSentenceBtn" class="btn-cinema px-3 py-1.5 text-xs text-slate-200">
-          [朗读整句]
-        </button>
         <button id="nextQuestionBtn" class="btn-gold px-4 py-1.5 text-xs">
           下一个名场面
         </button>
@@ -1891,84 +1883,6 @@
     return arr;
   }
 
-  // ---- 语音朗读（兼容移动端浏览器 / 微信内置内核） ----
-  const ttsSynth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
-  let ttsKeepAlive = null;
-
-  if (ttsSynth) {
-    // 部分移动端首次 getVoices() 返回空表，需借 voiceschanged 预热
-    ttsSynth.getVoices();
-    ttsSynth.addEventListener('voiceschanged', () => ttsSynth.getVoices());
-    // iOS Safari 等要求在首次用户手势中“解锁”语音引擎
-    const unlockTts = () => { try { ttsSynth.resume(); } catch (e) {} };
-    document.addEventListener('pointerdown', unlockTts, { once: true, passive: true });
-  }
-
-  function speak(text, rate = 0.9, userInitiated = false) {
-    if (!ttsSynth) {
-      if (userInitiated) showToast('当前浏览器不支持语音朗读，请用系统浏览器打开');
-      return;
-    }
-    const clean = String(text == null ? '' : text).replace(/_{2,}/g, '').trim();
-    if (!clean) return;
-
-    const fire = () => {
-      try {
-        const utterance = new SpeechSynthesisUtterance(clean);
-        utterance.lang = 'en-US';
-        utterance.rate = rate;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        const voices = ttsSynth.getVoices();
-        const engVoice =
-          voices.find(v => /^en[-_]US/i.test(v.lang) && /google|natural/i.test(v.name)) ||
-          voices.find(v => /^en/i.test(v.lang) && /google|natural|samantha|daniel/i.test(v.name)) ||
-          voices.find(v => /^en[-_]US/i.test(v.lang)) ||
-          voices.find(v => /^en/i.test(v.lang));
-        if (engVoice) utterance.voice = engVoice;
-
-        clearInterval(ttsKeepAlive);
-        let started = false;
-        utterance.onstart = () => { started = true; };
-        utterance.onend = () => clearInterval(ttsKeepAlive);
-        utterance.onerror = () => {
-          clearInterval(ttsKeepAlive);
-          if (userInitiated) showToast('朗读失败，请调大媒体音量或用系统浏览器打开');
-        };
-
-        ttsSynth.speak(utterance);
-
-        // 安卓 Chrome 长句约 15 秒会被挂起，定时 pause/resume 保活
-        ttsKeepAlive = setInterval(() => {
-          if (ttsSynth.speaking && !ttsSynth.paused) {
-            ttsSynth.pause();
-            ttsSynth.resume();
-          }
-        }, 10000);
-
-        // 微信 X5 等内核可能“静默不支持”：800ms 未实际发声则提示
-        setTimeout(() => {
-          if (userInitiated && !started && !ttsSynth.speaking) {
-            showToast('当前环境可能不支持朗读，请点右上角用系统浏览器打开');
-          }
-        }, 800);
-      } catch (err) {
-        console.warn('TTS Error:', err);
-        if (userInitiated) showToast('朗读失败，请用系统浏览器打开');
-      }
-    };
-
-    // 关键兼容：正在播放时必须先 cancel 再延迟一小段时间 speak，
-    // 同帧 cancel()+speak() 在安卓 Chrome / 微信内核会直接静默
-    if (ttsSynth.speaking || ttsSynth.pending) {
-      ttsSynth.cancel();
-      setTimeout(fire, 120);
-    } else {
-      fire();
-    }
-  }
-
   function loadPersistedData() {
     try {
       const savedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
@@ -2238,12 +2152,6 @@
 
   function closeVocabModal() {
     elVocabModal.classList.add('opacity-0', 'pointer-events-none');
-    if (ttsSynth) {
-      try {
-        clearInterval(ttsKeepAlive);
-        ttsSynth.cancel();
-      } catch (e) {}
-    }
   }
 
   function handleModalActionBtnClick() {
@@ -2367,19 +2275,12 @@
           <p class="text-[11px] text-slate-400 truncate mt-0.5">[来源] ${item.movie}</p>
         </div>
         <div class="flex items-center gap-1">
-          <button class="play-btn px-2 py-1 bg-brand-800 hover:bg-brand-700 border border-white/20 text-brand-accent text-xs">
-            [发音]
-          </button>
           <button class="remove-btn px-2 py-1 bg-brand-800 hover:bg-brand-wrong/30 border border-white/20 text-slate-400 hover:text-brand-wrong text-xs">
             [移除]
           </button>
         </div>
       `;
 
-      row.querySelector('.play-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        speak(item.word, 0.9, true);
-      });
       row.querySelector('.remove-btn').addEventListener('click', (e) => {
         e.stopPropagation();
         removeFromNotebook(item.word);
@@ -2424,19 +2325,6 @@
   }
 
   function setupEventListeners() {
-    document.getElementById('pronounceBtn').addEventListener('click', () => {
-      const item = modalActiveItem || state.currentQuestion;
-      if (item) speak(item.word, 0.9, true);
-    });
-
-    document.getElementById('readSentenceBtn').addEventListener('click', () => {
-      const item = modalActiveItem || state.currentQuestion;
-      if (item) {
-        const full = item.en.replace(/_{3,}/g, item.word);
-        speak(full, 0.85, true);
-      }
-    });
-
     document.getElementById('nextQuestionBtn').addEventListener('click', handleModalActionBtnClick);
     document.getElementById('closeModalBtn').addEventListener('click', closeVocabModal);
 
