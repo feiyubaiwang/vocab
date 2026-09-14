@@ -1898,8 +1898,15 @@
         if (typeof parsed.currentIndex === 'number' && parsed.currentIndex >= 0 && parsed.currentIndex < MOVIE_VOCAB_DB.length) {
           state.currentIndex = parsed.currentIndex;
         }
+        const hadCleared = Array.isArray(parsed.cleared) && parsed.cleared.length > 0;
         if (Array.isArray(parsed.answeredIds)) {
           state.answeredIds = new Set(parsed.answeredIds);
+        } else if (hadCleared) {
+          // 旧版本迁移：有 cleared 但没有 answeredIds，提示用户数据已规范化
+          const alreadyNotified = localStorage.getItem(STORAGE_KEY_PROGRESS + '_migrated');
+          if (!alreadyNotified) {
+            state._needMigrationToast = true;
+          }
         }
         if (parsed.selectedAnswers && typeof parsed.selectedAnswers === 'object') {
           state.selectedAnswers = parsed.selectedAnswers;
@@ -2509,6 +2516,11 @@
     setupEventListeners();
     // 显示上次停留的关卡并确保选项随机化排布
     renderQuestion(state.currentIndex);
+
+    if (state._needMigrationToast) {
+      localStorage.setItem(STORAGE_KEY_PROGRESS + '_migrated', '1');
+      setTimeout(() => showToast('已自动升级：之前答题次数被重复计数，现在每题只算一次'), 500);
+    }
   });
   </script>
 </body>
