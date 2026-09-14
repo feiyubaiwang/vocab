@@ -2049,6 +2049,7 @@
     // 恢复已答题目状态（页面刷新/退出重进后）
     if (state.answeredIds.has(q.id)) {
       state.hasAnswered = true;
+      state.selectedOption = state.selectedAnswers[q.id] || null;
       const wasCorrect = state.clearedLevels.has(q.id);
 
       const blankSlot = document.getElementById('blankSlot');
@@ -2103,15 +2104,14 @@
       blankSlot.style.color = isCorrect ? '#63A633' : '#A6263E';
     }
 
+    // 只高亮用户的选择：对了就那项绿，错了就那项红，不额外把正确答案也标出来
+    if (isCorrect) {
+      targetBtn.classList.add('state-correct');
+    } else {
+      targetBtn.classList.add('state-wrong');
+    }
     const allBtns = elOptionsContainer.querySelectorAll('.option-btn');
-    allBtns.forEach(btn => {
-      const w = btn.dataset.word;
-      if (w === q.word) {
-        btn.classList.add('state-correct');
-      } else if (btn === targetBtn && !isCorrect) {
-        btn.classList.add('state-wrong');
-      }
-    });
+    allBtns.forEach(btn => btn.disabled = true);
 
     if (isCorrect) {
       state.clearedLevels.add(q.id);
