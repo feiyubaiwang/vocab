@@ -257,26 +257,26 @@
         </button>
       </div>
 
-      <!-- 单词与音标 -->
-      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 pb-3 mb-3 border-b border-white/10">
+      <!-- 单词、音标与朗读/收藏按钮（移动端两按钮同行等高对齐） -->
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-3 pb-3 mb-3 border-b border-white/10">
         <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <h2 id="modalWord" class="text-2xl md:text-3xl font-bold tracking-wide text-brand-accent break-all">
-              word
-            </h2>
-            <button id="pronounceBtn" class="px-2 py-0.5 text-xs bg-brand-700 hover:bg-brand-600 text-brand-accent border border-brand-accent/40">
-              [朗读单词]
-            </button>
-          </div>
-          <div class="flex items-center gap-2 mt-1">
+          <h2 id="modalWord" class="text-2xl md:text-3xl font-bold tracking-wide text-brand-accent break-all">
+            word
+          </h2>
+          <div class="flex flex-wrap items-center gap-2 mt-1.5">
             <span id="modalPhonetic" class="text-xs font-mono text-slate-300">/phonetic/</span>
             <span id="modalPos" class="text-xs px-1.5 py-0.2 bg-brand-700 text-slate-200 italic font-mono">pos.</span>
           </div>
         </div>
 
-        <button id="toggleBookmarkBtn" class="text-xs px-2.5 py-1 border border-white/20 bg-brand-800 hover:bg-brand-700 text-slate-200">
-          <span id="bookmarkText">[加入生词本]</span>
-        </button>
+        <div class="flex items-stretch gap-2 shrink-0">
+          <button id="pronounceBtn" class="btn-cinema whitespace-nowrap flex items-center justify-center px-3 py-2 text-xs text-brand-accent">
+            [朗读单词]
+          </button>
+          <button id="toggleBookmarkBtn" class="btn-cinema whitespace-nowrap flex items-center justify-center px-3 py-2 text-xs text-slate-200">
+            <span id="bookmarkText">[加入生词本]</span>
+          </button>
+        </div>
       </div>
 
       <!-- 中文释义 -->
@@ -1891,23 +1891,81 @@
     return arr;
   }
 
-  function speak(text, rate = 0.9) {
-    if (!('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const clean = text.replace(/_{2,}/g, '');
-      const utterance = new SpeechSynthesisUtterance(clean);
-      utterance.lang = 'en-US';
-      utterance.rate = rate;
-      utterance.pitch = 1.0;
-      
-      const voices = window.speechSynthesis.getVoices();
-      const engVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel')));
-      if (engVoice) utterance.voice = engVoice;
-      
-      window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.warn("TTS Error:", err);
+  // ---- 语音朗读（兼容移动端浏览器 / 微信内置内核） ----
+  const ttsSynth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  let ttsKeepAlive = null;
+
+  if (ttsSynth) {
+    // 部分移动端首次 getVoices() 返回空表，需借 voiceschanged 预热
+    ttsSynth.getVoices();
+    ttsSynth.addEventListener('voiceschanged', () => ttsSynth.getVoices());
+    // iOS Safari 等要求在首次用户手势中“解锁”语音引擎
+    const unlockTts = () => { try { ttsSynth.resume(); } catch (e) {} };
+    document.addEventListener('pointerdown', unlockTts, { once: true, passive: true });
+  }
+
+  function speak(text, rate = 0.9, userInitiated = false) {
+    if (!ttsSynth) {
+      if (userInitiated) showToast('当前浏览器不支持语音朗读，请用系统浏览器打开');
+      return;
+    }
+    const clean = String(text == null ? '' : text).replace(/_{2,}/g, '').trim();
+    if (!clean) return;
+
+    const fire = () => {
+      try {
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        const voices = ttsSynth.getVoices();
+        const engVoice =
+          voices.find(v => /^en[-_]US/i.test(v.lang) && /google|natural/i.test(v.name)) ||
+          voices.find(v => /^en/i.test(v.lang) && /google|natural|samantha|daniel/i.test(v.name)) ||
+          voices.find(v => /^en[-_]US/i.test(v.lang)) ||
+          voices.find(v => /^en/i.test(v.lang));
+        if (engVoice) utterance.voice = engVoice;
+
+        clearInterval(ttsKeepAlive);
+        let started = false;
+        utterance.onstart = () => { started = true; };
+        utterance.onend = () => clearInterval(ttsKeepAlive);
+        utterance.onerror = () => {
+          clearInterval(ttsKeepAlive);
+          if (userInitiated) showToast('朗读失败，请调大媒体音量或用系统浏览器打开');
+        };
+
+        ttsSynth.speak(utterance);
+
+        // 安卓 Chrome 长句约 15 秒会被挂起，定时 pause/resume 保活
+        ttsKeepAlive = setInterval(() => {
+          if (ttsSynth.speaking && !ttsSynth.paused) {
+            ttsSynth.pause();
+            ttsSynth.resume();
+          }
+        }, 10000);
+
+        // 微信 X5 等内核可能“静默不支持”：800ms 未实际发声则提示
+        setTimeout(() => {
+          if (userInitiated && !started && !ttsSynth.speaking) {
+            showToast('当前环境可能不支持朗读，请点右上角用系统浏览器打开');
+          }
+        }, 800);
+      } catch (err) {
+        console.warn('TTS Error:', err);
+        if (userInitiated) showToast('朗读失败，请用系统浏览器打开');
+      }
+    };
+
+    // 关键兼容：正在播放时必须先 cancel 再延迟一小段时间 speak，
+    // 同帧 cancel()+speak() 在安卓 Chrome / 微信内核会直接静默
+    if (ttsSynth.speaking || ttsSynth.pending) {
+      ttsSynth.cancel();
+      setTimeout(fire, 120);
+    } else {
+      fire();
     }
   }
 
@@ -2182,6 +2240,12 @@
 
   function closeVocabModal() {
     elVocabModal.classList.add('opacity-0', 'pointer-events-none');
+    if (ttsSynth) {
+      try {
+        clearInterval(ttsKeepAlive);
+        ttsSynth.cancel();
+      } catch (e) {}
+    }
   }
 
   function handleModalActionBtnClick() {
@@ -2316,7 +2380,7 @@
 
       row.querySelector('.play-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        speak(item.word);
+        speak(item.word, 0.9, true);
       });
       row.querySelector('.remove-btn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2364,14 +2428,14 @@
   function setupEventListeners() {
     document.getElementById('pronounceBtn').addEventListener('click', () => {
       const item = modalActiveItem || state.currentQuestion;
-      if (item) speak(item.word);
+      if (item) speak(item.word, 0.9, true);
     });
 
     document.getElementById('readSentenceBtn').addEventListener('click', () => {
       const item = modalActiveItem || state.currentQuestion;
       if (item) {
         const full = item.en.replace(/_{3,}/g, item.word);
-        speak(full, 0.85);
+        speak(full, 0.85, true);
       }
     });
 
