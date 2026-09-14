@@ -1859,7 +1859,6 @@
   const state = {
     currentIndex: 0,
     currentQuestion: null,
-    correctCount: 0,
     answeredIds: new Set(),   // 已作答题目的 id，用于去重计数
     hasAnswered: false,
     selectedOption: null,
@@ -1883,6 +1882,13 @@
     return arr;
   }
 
+  // 答对题数 = answeredIds ∩ clearedLevels（始终派生，永不单独存储）
+  function getCorrectCount() {
+    let c = 0;
+    state.answeredIds.forEach(id => { if (state.clearedLevels.has(id)) c++; });
+    return c;
+  }
+
   function loadPersistedData() {
     try {
       const savedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
@@ -1891,18 +1897,11 @@
         if (typeof parsed.currentIndex === 'number' && parsed.currentIndex >= 0 && parsed.currentIndex < MOVIE_VOCAB_DB.length) {
           state.currentIndex = parsed.currentIndex;
         }
-        const loadedCleared = Array.isArray(parsed.cleared) ? new Set(parsed.cleared) : new Set();
-        state.clearedLevels = loadedCleared;
-
         if (Array.isArray(parsed.answeredIds)) {
-          // 新版本：用持久化的答题 id 集合，结合 cleared 重建 correctCount
           state.answeredIds = new Set(parsed.answeredIds);
-          state.correctCount = 0;
-          state.answeredIds.forEach(id => { if (loadedCleared.has(id)) state.correctCount++; });
-        } else {
-          // 旧版本迁移：没有去重集合时，只保留 clearedLevels，answeredIds 为空
-          // 旧 correctCount / totalAttempted 因累计不准被丢弃，让用户重新开始或逐题答完后计数自然恢复
-          state.correctCount = loadedCleared.size;
+        }
+        if (Array.isArray(parsed.cleared)) {
+          state.clearedLevels = new Set(parsed.cleared);
         }
       }
       const savedNotebook = localStorage.getItem(STORAGE_KEY_NOTEBOOK);
@@ -1920,7 +1919,6 @@
     try {
       const progressPayload = {
         currentIndex: state.currentIndex,
-        correctCount: state.correctCount,
         answeredIds: Array.from(state.answeredIds),
         cleared: Array.from(state.clearedLevels)
       };
@@ -1991,8 +1989,8 @@
 
     const answeredN = state.answeredIds.size;
     if (answeredN > 0) {
-      const acc = Math.round((state.correctCount / answeredN) * 100);
-      elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${answeredN})`;
+      const acc = Math.round((getCorrectCount() / answeredN) * 100);
+      elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${getCorrectCount()}/${answeredN})`;
     } else {
       elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">100%</span>`;
     }
@@ -2097,7 +2095,6 @@
     });
 
     if (isCorrect) {
-      state.correctCount++;
       state.clearedLevels.add(q.id);
     } else {
       addToNotebook(q);
@@ -2107,8 +2104,8 @@
 
     // 更新正确率指示
     const answeredN = state.answeredIds.size;
-    const acc = answeredN > 0 ? Math.round((state.correctCount / answeredN) * 100) : 100;
-    elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${state.correctCount}/${answeredN})`;
+    const acc = answeredN > 0 ? Math.round((getCorrectCount() / answeredN) * 100) : 100;
+    elAccuracyStats.innerHTML = `正确率: <span class="text-brand-accent font-semibold">${acc}%</span> (${getCorrectCount()}/${answeredN})`;
 
     const actionBar = document.getElementById('answeredActionBar');
     const statusText = document.getElementById('answeredStatusText');
@@ -2219,7 +2216,7 @@
 
   function openCompletionModal() {
     const total = state.answeredIds.size || MOVIE_VOCAB_DB.length;
-    const correct = state.correctCount;
+    const correct = getCorrectCount();
     const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
 
     elCompAccuracy.textContent = `${accuracy}%`;
@@ -2476,7 +2473,6 @@
       hideRestartModal();
       state.currentIndex = 0;
       state.clearedLevels.clear();
-      state.correctCount = 0;
       state.answeredIds.clear();
       state.notebook.clear();
       savePersistedData();
