@@ -43,6 +43,30 @@
       background-attachment: fixed;
       min-height: 100vh;
       color: #f1f3f9;
+      overflow-x: hidden;
+    }
+
+    /* 防止任何内容撑出横向布局视口（移动端 fixed 弹窗依赖布局视口居中） */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* 弹窗：内容超高时可纵向滚动，且无论高低都相对屏幕居中、完整可见 */
+    #vocabModal, #completionModal, #levelMapModal, #notebookModal, #restartModal {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    #vocabModal > div,
+    #completionModal > div,
+    #levelMapModal > div,
+    #notebookModal > div,
+    #restartModal > div {
+      margin: auto;
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* 柔和微渐变高级面板与卡片 */
@@ -152,18 +176,18 @@
     <!-- 场景主卡片 -->
     <div class="flat-panel p-5 md:p-7 border border-white/15">
       
-      <!-- 电影与角色信息栏 -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-4 border-b border-white/10 text-xs">
-        <div class="flex items-center gap-2">
-          <span class="px-2 py-0.5 bg-brand-900 border border-brand-accent/40 text-brand-accent font-semibold" id="movieTitle">
+      <!-- 电影与角色信息栏（移动端纵向堆叠，杜绝文字撑出屏幕） -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 mb-4 border-b border-white/10 text-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0">
+          <span class="self-start w-fit max-w-full sm:shrink-0 px-2 py-0.5 bg-brand-900 border border-brand-accent/40 text-brand-accent font-semibold" id="movieTitle">
             电影加载中...
           </span>
-          <span id="sceneTag" class="text-slate-300 bg-white/5 px-2 py-0.5 border border-white/10 truncate max-w-xs md:max-w-md">
+          <span id="sceneTag" class="w-full sm:w-auto sm:flex-1 min-w-0 truncate text-slate-300 bg-white/5 px-2 py-0.5 border border-white/10">
             场景加载中...
           </span>
         </div>
 
-        <div class="text-slate-300 bg-brand-800 px-2.5 py-0.5 border border-white/10 font-mono">
+        <div class="shrink-0 self-start sm:self-auto max-w-full truncate text-slate-300 bg-brand-800 px-2.5 py-0.5 border border-white/10 font-mono">
           <span class="text-brand-accent" id="speakerName">角色甲</span>
           <span class="mx-1 text-slate-400">至</span>
           <span class="text-slate-200" id="listenerName">角色乙</span>
@@ -172,13 +196,7 @@
 
       <!-- 英文原句 -->
       <div class="my-4">
-        <p id="quoteEnglish" class="text-base md:text-xl text-slate-100 leading-relaxed tracking-wide">
-          <!-- 挖空英文句子 -->
-        </p>
-
-        <!-- 中文释义 -->
-      <div class="my-4">
-        <p id="quoteEnglish" class="text-base md:text-xl text-slate-100 leading-relaxed tracking-wide">
+        <p id="quoteEnglish" class="text-base md:text-xl text-slate-100 leading-relaxed tracking-wide break-words">
           <!-- 挖空英文句子 -->
         </p>
 
@@ -227,10 +245,10 @@
 
   <!-- 单词卡片 Modal -->
   <div id="vocabModal" class="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
-    <div class="flat-card w-full max-w-lg p-6 border border-brand-accent text-left relative">
+    <div class="flat-card w-full max-w-lg p-4 sm:p-6 border border-brand-accent text-left relative">
       
       <!-- 顶部状态栏与关闭 -->
-      <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-2">
+      <div class="flex items-center justify-between gap-2 mb-4 border-b border-white/10 pb-2">
         <div id="modalResultBadge" class="text-xs font-bold tracking-wide">
           <!-- 动态提示 -->
         </div>
@@ -240,10 +258,10 @@
       </div>
 
       <!-- 单词与音标 -->
-      <div class="flex items-baseline justify-between gap-3 pb-3 mb-3 border-b border-white/10">
-        <div>
-          <div class="flex items-center gap-3">
-            <h2 id="modalWord" class="text-2xl md:text-3xl font-bold tracking-wide text-brand-accent">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 pb-3 mb-3 border-b border-white/10">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h2 id="modalWord" class="text-2xl md:text-3xl font-bold tracking-wide text-brand-accent break-all">
               word
             </h2>
             <button id="pronounceBtn" class="px-2 py-0.5 text-xs bg-brand-700 hover:bg-brand-600 text-brand-accent border border-brand-accent/40">
@@ -272,7 +290,7 @@
       <!-- 电影台词回顾 -->
       <div class="bg-brand-900 p-3 border border-white/10 mb-4 text-xs">
         <div class="text-brand-accent font-bold mb-1">[场景台词还原]</div>
-        <p id="modalFullQuote" class="text-slate-200 leading-relaxed">
+        <p id="modalFullQuote" class="text-slate-200 leading-relaxed break-words">
           <!-- 还原完整台词 -->
         </p>
         <p id="modalQuoteTrans" class="mt-1.5 text-slate-400 border-t border-white/10 pt-1.5">
@@ -1999,7 +2017,9 @@
     }
 
     elMovieTitle.textContent = q.movie;
+    elMovieTitle.title = q.movie;
     elSceneTag.textContent = q.scene;
+    elSceneTag.title = q.scene;
     elSpeaker.textContent = q.speaker;
     elListener.textContent = q.listener;
 
