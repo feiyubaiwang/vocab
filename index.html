@@ -1860,6 +1860,7 @@
     currentIndex: 0,
     currentQuestion: null,
     answeredIds: new Set(),   // 已作答题目的 id，用于去重计数
+    selectedAnswers: {},      // 作答时每题的用户选择（id → 用户选的词）
     hasAnswered: false,
     selectedOption: null,
     clearedLevels: new Set(),
@@ -1900,6 +1901,9 @@
         if (Array.isArray(parsed.answeredIds)) {
           state.answeredIds = new Set(parsed.answeredIds);
         }
+        if (parsed.selectedAnswers && typeof parsed.selectedAnswers === 'object') {
+          state.selectedAnswers = parsed.selectedAnswers;
+        }
         if (Array.isArray(parsed.cleared)) {
           state.clearedLevels = new Set(parsed.cleared);
         }
@@ -1920,6 +1924,7 @@
       const progressPayload = {
         currentIndex: state.currentIndex,
         answeredIds: Array.from(state.answeredIds),
+        selectedAnswers: state.selectedAnswers,
         cleared: Array.from(state.clearedLevels)
       };
       localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progressPayload));
@@ -2048,7 +2053,11 @@
 
       elOptionsContainer.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
-        if (btn.dataset.word === q.word) btn.classList.add('state-correct');
+        if (btn.dataset.word === q.word) {
+          btn.classList.add('state-correct');
+        } else if (!wasCorrect && btn.dataset.word === state.selectedAnswers[q.id]) {
+          btn.classList.add('state-wrong');
+        }
       });
 
       const actionBar = document.getElementById('answeredActionBar');
@@ -2075,6 +2084,7 @@
     state.hasAnswered = true;
     state.selectedOption = selectedWord;
     state.answeredIds.add(q.id);
+    state.selectedAnswers[q.id] = selectedWord;
     const isCorrect = (selectedWord.toLowerCase() === q.word.toLowerCase());
 
     const blankSlot = document.getElementById('blankSlot');
@@ -2474,6 +2484,7 @@
       state.currentIndex = 0;
       state.clearedLevels.clear();
       state.answeredIds.clear();
+      state.selectedAnswers = {};
       state.notebook.clear();
       savePersistedData();
       renderQuestion(0);
