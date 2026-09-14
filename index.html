@@ -2060,10 +2060,12 @@
 
       elOptionsContainer.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
-        if (btn.dataset.word === q.word) {
-          btn.classList.add('state-correct');
-        } else if (!wasCorrect && btn.dataset.word === state.selectedAnswers[q.id]) {
-          btn.classList.add('state-wrong');
+        if (wasCorrect) {
+          // 用户答对：只标正确项为绿
+          if (btn.dataset.word === q.word) btn.classList.add('state-correct');
+        } else {
+          // 用户答错：只标他当时选的那项为红，不额外把正确项也标绿
+          if (btn.dataset.word === state.selectedAnswers[q.id]) btn.classList.add('state-wrong');
         }
       });
 
